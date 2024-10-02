@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather App</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f8ff;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        input[type="text"] {
+            padding: 10px;
+            margin-right: 10px;
+            border: 2px solid #007BFF;
+            border-radius: 5px;
+            width: 200px;
+            font-size: 16px;
+        }
+
+        button {
+            padding: 10px 15px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .weather-info {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #007BFF;
+            border-radius: 5px;
+            background-color: white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .weather-info h2 {
+            margin: 0;
+            color: #007BFF;
+        }
+
+        .weather-info p {
+            margin: 5px 0;
+            color: #555;
+        }
+
+        .weather-image {
+    margin-top: 10px;
+    width: 600px; 
+    height: 600px; 
+    max-width: 600%; 
+}
+
+        
+        @media (max-width: 600px) {
+            input[type="text"] {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+
+            button {
+                width: 100%;
+            }
+
+            .weather-info {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Weather App</h1>
+    <input type="text" id="city-input" placeholder="Enter city name" />
+    <button id="fetch-weather">Get Weather</button>
+
+    <div class="weather-info" id="weather-info"></div>
+    <img id="weather-image" class="weather-image" src="" alt="" style="display: none;">
+
+    <script>
+        document.getElementById('fetch-weather').addEventListener('click', function() {
+            const city = document.getElementById('city-input').value;
+            const data = null;
+
+            const xhr = new XMLHttpRequest();
+            xhr.withCredentials = true;
+
+            xhr.addEventListener('readystatechange', function () {
+                if (this.readyState === this.DONE) {
+                    const response = JSON.parse(this.responseText);
+                    if (response.error) {
+                        document.getElementById('weather-info').innerText = 'Error: ' + response.error.message;
+                        document.getElementById('weather-image').style.display = 'none'; 
+                    } else {
+                        document.getElementById('weather-info').innerHTML = `
+                            <h2>Weather in ${response.location.name}</h2>
+                            <p>Temperature: ${response.current.temp_c} °C</p>
+                            <p>Condition: ${response.current.condition.text}</p>
+                        `;
+
+                        const condition = response.current.condition.text.toLowerCase();
+                        const imageUrl = condition.includes('rain') ? 'http://openweathermap.org/img/wn/10d.png' :
+                                         condition.includes('sun') ? 'http://openweathermap.org/img/wn/01d.png' :
+                                         condition.includes('cloud') ? 'http://openweathermap.org/img/wn/03d.png': 
+                                         'https://example.com/default.png';                
+                        
+                        const weatherImage = document.getElementById('weather-image');
+                        if (response.location.name.toLowerCase() === 'toronto') {
+                            weatherImage.src = 'oip.jpg';
+                            weatherImage.alt = 'Image of Toronto';
+                        } else {
+                            weatherImage.style.display = 'none'; 
+                        }
+                        weatherImage.style.display = 'block'; 
+                    }
+                }
+            });
+
+            const encodedCity = encodeURIComponent(city);
+            xhr.open('GET', `https://weatherapi-com.p.rapidapi.com/current.json?q=${encodedCity}`);
+            xhr.setRequestHeader('x-rapidapi-key', '18a41b215dmsh889d3dcd628c9e4p1d9ac6jsn596ea0037b31');
+            xhr.setRequestHeader('x-rapidapi-host', 'weatherapi-com.p.rapidapi.com');
+
+            xhr.send(data);
+        });
+    </script>
+
+</body>
+</html>
+
